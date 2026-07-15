@@ -1,126 +1,71 @@
 import { useState } from "react";
+import "./App.css";
 
-const questions = [
-  {
-    question: "React nima?",
-    options: ["Kutubxona", "Database", "Server", "Browser"],
-    answer: "Kutubxona",
-  },
-  {
-    question: "HTML nimaning qisqartmasi?",
-    options: [
-      "Hyper Text Markup Language",
-      "High Text Language",
-      "Home Tool Language",
-      "Hyper Tool Markup",
-    ],
-    answer: "Hyper Text Markup Language",
-  },
-  {
-    question: "CSS nima uchun ishlatiladi?",
-    options: ["Dizayn", "Database", "Server", "API"],
-    answer: "Dizayn",
-  },
-  {
-    question: "JavaScript qanday til?",
-    options: ["Programming Language", "Database", "Browser", "OS"],
-    answer: "Programming Language",
-  },
-  {
-    question: "React komponentlari nima qaytaradi?",
-    options: ["JSX", "CSS", "JSON", "HTML File"],
-    answer: "JSX",
-  },
-];
+function App() {
+  const [title, setTitle] = useState("");
+  const [amount, setAmount] = useState("");
+  const [expenses, setExpenses] = useState([]);
 
-export default function App() {
-  const [current, setCurrent] = useState(0);
-  const [score, setScore] = useState(0);
-  const [finish, setFinish] = useState(false);
+  const addExpense = () => {
+    if (!title || !amount) return;
 
-  const checkAnswer = (option) => {
-    if (option === questions[current].answer) {
-      setScore(score + 1);
-    }
+    const newExpense = {
+      id: Date.now(),
+      title,
+      amount: Number(amount),
+    };
 
-    if (current + 1 < questions.length) {
-      setCurrent(current + 1);
-    } else {
-      setFinish(true);
-    }
+    setExpenses([...expenses, newExpense]);
+    setTitle("");
+    setAmount("");
   };
 
-  const restart = () => {
-    setCurrent(0);
-    setScore(0);
-    setFinish(false);
+  const deleteExpense = (id) => {
+    setExpenses(expenses.filter((item) => item.id !== id));
   };
 
-  if (finish) {
-    return (
-      <div style={styles.container}>
-        <div style={styles.card}>
-          <h1>🎉 Quiz Tugadi!</h1>
-          <h2>
-            Natija: {score} / {questions.length}
-          </h2>
-          <button style={styles.button} onClick={restart}>
-            Qayta Boshlash
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const total = expenses.reduce((sum, item) => sum + item.amount, 0);
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h2>
-          Savol {current + 1} / {questions.length}
-        </h2>
+    <div className="container">
+      <div className="card">
+        <h1>💰 Expense Tracker</h1>
 
-        <h3>{questions[current].question}</h3>
+        <input
+          type="text"
+          placeholder="Expense Name"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
 
-        {questions[current].options.map((item, index) => (
-          <button
-            key={index}
-            style={styles.button}
-            onClick={() => checkAnswer(item)}
-          >
-            {item}
-          </button>
+        <input
+          type="number"
+          placeholder="Amount"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+        />
+
+        <button onClick={addExpense}>Add Expense</button>
+
+        <h2>Total: ${total}</h2>
+
+        {expenses.map((item) => (
+          <div className="expense" key={item.id}>
+            <span>
+              {item.title} - ${item.amount}
+            </span>
+
+            <button
+              className="delete"
+              onClick={() => deleteExpense(item.id)}
+            >
+              ❌
+            </button>
+          </div>
         ))}
       </div>
     </div>
   );
 }
 
-const styles = {
-  container: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "100vh",
-    background: "linear-gradient(135deg,#4f46e5,#9333ea)",
-  },
-  card: {
-    background: "#fff",
-    padding: "30px",
-    borderRadius: "15px",
-    width: "350px",
-    textAlign: "center",
-    boxShadow: "0 10px 20px rgba(0,0,0,0.2)",
-  },
-  button: {
-    display: "block",
-    width: "100%",
-    padding: "10px",
-    margin: "10px 0",
-    border: "none",
-    borderRadius: "8px",
-    background: "#4f46e5",
-    color: "#fff",
-    cursor: "pointer",
-    fontSize: "16px",
-  },
-};
+export default App;
